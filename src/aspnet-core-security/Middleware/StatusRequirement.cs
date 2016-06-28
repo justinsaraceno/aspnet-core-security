@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace aspnet_core_security
 {
@@ -13,12 +14,12 @@ namespace aspnet_core_security
             _status = status;
         }
 
-        protected override void Handle(AuthorizationContext context, StatusRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, StatusRequirement requirement)
         {
             if (context.User.IsInRole("administrator"))
             {
                 context.Succeed(requirement);
-                return;
+                return Task.FromResult(context);
             }
 
             if (context.User.HasClaim("company", this._company) &&
@@ -26,6 +27,8 @@ namespace aspnet_core_security
             {
                 context.Succeed(requirement);
             }
+
+            return Task.FromResult(context);
         }
     }
 }
